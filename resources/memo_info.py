@@ -103,10 +103,10 @@ class MemoResource(Resource) :
                     set  title = %s , 
                     date = %s , 
                     content = %s
-                    where id = %s ;'''
+                    where id = %s and user_id = %s ;'''
             
             record = (data['title'], data['date'],
-                        data['content'], memo_id )
+                        data['content'], memo_id ,user_id)
 
             # 3. 커서를 가져온다.
             cursor = connection.cursor()
@@ -130,18 +130,20 @@ class MemoResource(Resource) :
         return {'result' :'success'}, 200
 
     # 삭제하는 delete 함수 
+    @jwt_required()
     def delete(self, memo_id) :
 
         try :
             # 데이터 삭제
             # 1. DB에 연결
             connection = get_connection()
+            user_id = get_jwt_identity()
 
             # 2. 쿼리문 만들기
             query = '''delete from memo
-                    where id = %s ;'''
+                    where id = %s and user_id = %s ;'''
             
-            record = ( memo_id, )
+            record = ( memo_id, user_id )
 
             # 3. 커서를 가져온다.
             cursor = connection.cursor()

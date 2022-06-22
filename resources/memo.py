@@ -45,25 +45,27 @@ class MemoListResource(Resource):
             return {"error" : str(e)}, 503
 
         return {"result" : "success"}, 200
-
+    @jwt_required()
     def get(self) :
         # 쿼리 스트링으로 오는 데이터는 아래처럼 처리해준다.
         offset = request.args.get('offset')
         limit = request.args.get('limit')
 
+        user_id = get_jwt_identity()
+
         # 디비로부터 데이터를 받아서, 클라이언트에 보내준다.
         try :
             connection = get_connection()
 
-            query = '''select *
-                    from memo
-                    set is_publish = 1
+            query = '''select *from memo
+                    where user_id = %s
                     limit '''+offset+''' , '''+limit+''';'''
             
+            record = (user_id,)
             # select 문은, dictionary = True 를 해준다.
             cursor = connection.cursor(dictionary = True)
 
-            cursor.execute(query)
+            cursor.execute(query,record)
 
             # select 문은, 아래 함수를 이용해서, 데이터를 가져온다.
             result_list = cursor.fetchall()
@@ -76,6 +78,7 @@ class MemoListResource(Resource):
             # 문자열로 바꿔서 다시 저장해서 보낸다.
             i = 0
             for record in result_list :
+                result_list[i]['date'] = record['date'].isoformat()
                 result_list[i]['created_at'] = record['created_at'].isoformat()
                 result_list[i]['updated_at'] = record['updated_at'].isoformat()
                 i = i + 1                

@@ -7,7 +7,7 @@ from resources.user import UseLoginResource , UserLogoutResource ,jwt_blacklist
 from resources.memo import MemoListResource
 from resources.memo_info import MemoResource
 from resources.memo_publish import MemoPublishResource
-
+from resources.follow import FollowResource ,FollowListResource
 
 app  = Flask(__name__)
 
@@ -30,7 +30,8 @@ api.add_resource(UserLogoutResource,'/users/logout')
 api.add_resource(MemoResource,'/memos/<int:memo_id>')
 api.add_resource(MemoListResource,'/memos')
 api.add_resource(MemoPublishResource, '/memos/<int:memo_id>/publish')
-
+api.add_resource(FollowResource, '/follow/<int:follow_id>')
+api.add_resource(FollowListResource, '/follow')
 
 if __name__ == '__main__':
     app.run()
